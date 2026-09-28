@@ -1,0 +1,15 @@
+{"id": "c01", "name": "Priya Nair", "company": "Northwind Analytics", "plan": "Enterprise", "region": "India", "environment": "Snowflake warehouse, 240 seats, SSO via Okta", "csm": "Ravi K."}
+{"id": "c02", "name": "Marcus Bell", "company": "Bellwether Retail", "plan": "Growth", "region": "United States", "environment": "BigQuery, 60 seats", "csm": "Dana P."}
+{"id": "c03", "name": "Sofia Rossi", "company": "Rossi Logistics", "plan": "Enterprise", "region": "Italy", "environment": "Redshift, 180 seats, SSO via Azure AD", "csm": "Ravi K."}
+{"id": "c04", "name": "Daniel Osei", "company": "Accra Fintech", "plan": "Starter", "region": "Ghana", "environment": "Postgres source, 12 seats", "csm": "Dana P."}
+{"id": "c05", "name": "Hannah Kim", "company": "Kim & Park Legal", "plan": "Growth", "region": "South Korea", "environment": "Snowflake, 45 seats, strict data residency", "csm": "Mei L."}
+{"id": "c06", "name": "Tomas Novak", "company": "Novak Manufacturing", "plan": "Enterprise", "region": "Czechia", "environment": "Databricks, 300 seats", "csm": "Ravi K."}
+{"id": "c07", "name": "Aisha Rahman", "company": "Rahman Health", "plan": "Growth", "region": "UAE", "environment": "BigQuery, 80 seats, HIPAA mode", "csm": "Mei L."}
+{"id": "c08", "name": "Liam O'Connor", "company": "Shamrock Media", "plan": "Starter", "region": "Ireland", "environment": "CSV uploads, 8 seats", "csm": "Dana P."}
+{"id": "c09", "name": "Chen Wei", "company": "Lantern Commerce", "plan": "Enterprise", "region": "Singapore", "environment": "Snowflake, 210 seats, SSO via Okta", "csm": "Mei L."}
+{"id": "c10", "name": "Fatima Zahra", "company": "Atlas Education", "plan": "Growth", "region": "Morocco", "environment": "Postgres source, 55 seats", "csm": "Dana P."}
+{"id": "c11", "name": "Erik Larsen", "company": "Fjord Shipping", "plan": "Enterprise", "region": "Norway", "environment": "Databricks, 160 seats", "csm": "Ravi K."}
+{"id": "c12", "name": "Grace Mwangi", "company": "Nairobi Agritech", "plan": "Starter", "region": "Kenya", "environment": "BigQuery, 10 seats", "csm": "Dana P."}
+{"id": "c13", "name": "Julien Moreau", "company": "Moreau Fashion", "plan": "Growth", "region": "France", "environment": "Snowflake, 70 seats, GDPR mode", "csm": "Mei L."}
+{"id": "c14", "name": "Isabella Santos", "company": "Santos Energy", "plan": "Enterprise", "region": "Brazil", "environment": "Redshift, 320 seats, SSO via Azure AD", "csm": "Ravi K."}
+{"id": "c15", "name": "Noah Fischer", "company": "Fischer Robotics", "plan": "Growth", "region": "Germany", "environment": "Databricks, 90 seats", "csm": "Mei L."}

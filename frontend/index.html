@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Institutional Memory for Support</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo">◍</span>
+      <div>
+        <h1>Institutional Memory for Support</h1>
+        <p class="tagline">A support agent that remembers each customer — and grows a company-wide brain.</p>
+      </div>
+    </div>
+    <div class="controls">
+      <div class="mode-toggle" role="group" aria-label="Agent mode">
+        <button id="mode-memory" class="active" data-mode="memory">Memory</button>
+        <button id="mode-amnesia" data-mode="amnesia">Amnesia</button>
+      </div>
+      <button id="btn-seed" class="btn">1 · Seed history</button>
+      <button id="btn-stream" class="btn">2 · Play live stream</button>
+    </div>
+  </header>
+
+  <div class="statusbar">
+    <span id="status" class="status">Ready.</span>
+    <span class="badges">
+      <span class="badge" id="badge-memory">memory: —</span>
+      <span class="badge" id="badge-model">model: —</span>
+      <span class="badge" id="badge-bank">bank: —</span>
+    </span>
+  </div>
+
+  <main class="grid">
+    <section class="panel queue">
+      <h2>Ticket queue</h2>
+      <label class="auto"><input type="checkbox" id="auto-process" checked /> auto-draft on arrival</label>
+      <ul id="ticket-list"></ul>
+    </section>
+
+    <section class="panel detail">
+      <div id="ticket-empty" class="empty">Select a ticket, or play the live stream.</div>
+      <div id="ticket-view" hidden>
+        <div class="ticket-head">
+          <h2 id="t-subject"></h2>
+          <span id="t-meta" class="meta"></span>
+        </div>
+        <pre id="t-body" class="body"></pre>
+        <button id="btn-draft" class="btn primary">Draft reply (<span id="draft-mode">memory</span>)</button>
+      </div>
+      <div id="draft-view" hidden>
+        <div class="draft-head">
+          <h3>Draft reply</h3>
+          <span id="draft-stats" class="meta"></span>
+        </div>
+        <pre id="draft-text" class="draft"></pre>
+        <div id="draft-error" class="error" hidden></div>
+        <div class="two-col">
+          <div>
+            <h4>Grounded in memory <span id="cite-count" class="pill">0</span></h4>
+            <ul id="citations" class="citations"></ul>
+          </div>
+          <div>
+            <h4>Memory calls</h4>
+            <ul id="toolcalls" class="toolcalls"></ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <aside class="panel side">
+      <div class="card">
+        <h2>Emerging issues <span class="muted" id="ei-refreshed"></span></h2>
+        <p class="hint">Read straight from Hindsight's mental model — no LLM call.</p>
+        <pre id="emerging" class="report">—</pre>
+      </div>
+      <div class="card">
+        <h2>Regression alerts <span class="muted" id="reg-count"></span></h2>
+        <p class="hint">The agent reflects over every ticket to find issues we marked "fixed" that came back.</p>
+        <button id="btn-regressions" class="btn">Run regression audit</button>
+        <ul id="regressions" class="citations"></ul>
+      </div>
+      <div class="card">
+        <h2>Learning curve</h2>
+        <p class="hint">Replies grounded in memory as new tickets stream in.</p>
+        <svg id="learning-chart" class="chart" viewBox="0 0 300 120" preserveAspectRatio="none"></svg>
+        <div id="learning-stats" class="muted">No drafts yet.</div>
+      </div>
+      <div class="card">
+        <h2>Customer 360</h2>
+        <div id="customer-empty" class="muted">No customer selected.</div>
+        <div id="customer" hidden>
+          <div class="cust-name" id="c-name"></div>
+          <div class="cust-sub" id="c-sub"></div>
+          <dl id="c-facts"></dl>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

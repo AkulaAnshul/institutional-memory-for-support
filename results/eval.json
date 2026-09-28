@@ -1,0 +1,91 @@
+{
+  "summary": {
+    "tickets": 8,
+    "memory_grounded_rate": 1.0,
+    "amnesia_grounded_rate": 0.0,
+    "avg_memory_citations": 42.875,
+    "avg_amnesia_citations": 0.0
+  },
+  "rows": [
+    {
+      "ticket": "T0099",
+      "issue_type": "how_to",
+      "memory_grounded": true,
+      "amnesia_grounded": false,
+      "memory_citations": 71,
+      "amnesia_citations": 0,
+      "memory_ms": 7420,
+      "amnesia_ms": 2715
+    },
+    {
+      "ticket": "T0085",
+      "issue_type": "performance",
+      "memory_grounded": true,
+      "amnesia_grounded": false,
+      "memory_citations": 20,
+      "amnesia_citations": 0,
+      "memory_ms": 28262,
+      "amnesia_ms": 1598
+    },
+    {
+      "ticket": "T0086",
+      "issue_type": "performance",
+      "memory_grounded": true,
+      "amnesia_grounded": false,
+      "memory_citations": 46,
+      "amnesia_citations": 0,
+      "memory_ms": 41924,
+      "amnesia_ms": 10678
+    },
+    {
+      "ticket": "T0023",
+      "issue_type": "bug",
+      "memory_grounded": true,
+      "amnesia_grounded": false,
+      "memory_citations": 46,
+      "amnesia_citations": 0,
+      "memory_ms": 19737,
+      "amnesia_ms": 3793
+    },
+    {
+      "ticket": "T0071",
+      "issue_type": "feature_request",
+      "memory_grounded": true,
+      "amnesia_grounded": false,
+      "memory_citations": 45,
+      "amnesia_citations": 0,
+      "memory_ms": 22059,
+      "amnesia_ms": 1128
+    },
+    {
+      "ticket": "T0050",
+      "issue_type": "feature_request",
+      "memory_grounded": true,
+      "amnesia_grounded": false,
+      "memory_citations": 35,
+      "amnesia_citations": 0,
+      "memory_ms": 12286,
+      "amnesia_ms": 881
+    },
+    {
+      "ticket": "T0052",
+      "issue_type": "feature_request",
+      "memory_grounded": true,
+      "amnesia_grounded": false,
+      "memory_citations": 30,
+      "amnesia_citations": 0,
+      "memory_ms": 14623,
+      "amnesia_ms": 1118
+    },
+    {
+      "ticket": "T0090",
+      "issue_type": "performance",
+      "memory_grounded": true,
+      "amnesia_grounded": false,
+      "memory_citations": 50,
+      "amnesia_citations": 0,
+      "memory_ms": 35959,
+      "amnesia_ms": 2505
+    }
+  ]
+}

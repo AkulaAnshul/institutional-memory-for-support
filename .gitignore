@@ -1,0 +1,18 @@
+# Local, project-scoped environments and caches (never committed)
+.conda/
+.conda-pkgs/
+.pip-cache/
+.env
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+*.egg-info/
+.DS_Store
+
+# Challenge source documents (organizers' material, not our work)
+*.pdf
+.~lock.*
