@@ -71,11 +71,14 @@ same turn as recall, because Hindsight extracts memories asynchronously.
 
 ## Quick start
 
-Everything lives in this directory; the Python env is a local conda prefix, and the
-frontend has **no npm/build step**.
+**Full step-by-step instructions (including a no-key offline demo and a showcase script):
+[`docs/RUN_AND_SHOWCASE.md`](docs/RUN_AND_SHOWCASE.md).**
+
+Everything lives in this directory; the Python env is project-local and the frontend has
+**no npm/build step**.
 
 ```bash
-# 1. Project-local Python 3.11 env
+# 1. Project-local Python 3.11 env (conda, or `python3 -m venv .venv`)
 conda create --prefix ./.conda python=3.11 -y
 ./.conda/bin/pip install -r requirements.txt
 
@@ -102,8 +105,9 @@ cp .env.example .env
 To explore the UI and pipeline with neither service configured:
 
 ```bash
-USE_FAKE_MEMORY=1 ./.conda/bin/python scripts/demo.py
-USE_FAKE_MEMORY=1 ./.conda/bin/python scripts/eval.py
+USE_FAKE_MEMORY=1 USE_FAKE_AGENT=1 ./.conda/bin/python scripts/demo.py
+USE_FAKE_MEMORY=1 USE_FAKE_AGENT=1 ./.conda/bin/python scripts/regressions.py
+USE_FAKE_MEMORY=1 USE_FAKE_AGENT=1 ./.conda/bin/python scripts/eval.py
 ```
 
 The offline path uses an in-process memory stand-in and a deterministic agent so

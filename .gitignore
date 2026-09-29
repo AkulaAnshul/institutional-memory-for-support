@@ -16,3 +16,7 @@ venv/
 # Challenge source documents (organizers' material, not our work)
 *.pdf
 .~lock.*
+
+# Local tooling config (not part of the project)
+opencode.json
+.opencode/
