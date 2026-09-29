@@ -151,6 +151,20 @@ kbd {
 .btn.primary::after { content: ""; position: absolute; inset: 0; background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,.4), transparent 70%); transform: translateX(-130%); transition: transform .7s var(--ease); }
 .btn.primary:hover::after { transform: translateX(130%); }
 .btn.ghost { background: transparent; }
+.select {
+  appearance: none; -webkit-appearance: none;
+  background-color: rgba(255,255,255,.03);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2398a1bd' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 10px center;
+  border: 1px solid var(--line-2); color: var(--dim);
+  border-radius: 10px; padding: 8px 30px 8px 12px; font-size: 12.5px; font-weight: 600; cursor: pointer;
+  font-family: inherit; transition: border-color .2s, color .2s, background-color .2s;
+}
+.select:hover { border-color: rgba(255,255,255,.22); color: var(--text); }
+.select:focus { outline: none; border-color: var(--accent); }
+.select option { background: #0a0b11; color: var(--text); }
+.btn.danger { background: rgba(251,113,133,.14); border-color: rgba(251,113,133,.45); color: #fda4af; box-shadow: none; }
+.btn.danger:hover { background: rgba(251,113,133,.22); }
 .btn.big { padding: 12px 20px; font-size: 13.5px; border-radius: 12px; }
 .btn.tiny { padding: 5px 10px; font-size: 11px; border-radius: 8px; }
 .mode-tag { text-transform: uppercase; font-size: 9.5px; letter-spacing: .1em; background: rgba(6,7,13,.25); padding: 2px 7px; border-radius: 999px; }

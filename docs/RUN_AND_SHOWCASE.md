@@ -25,12 +25,8 @@ This uses an in-process memory stand-in and a deterministic agent, but it runs t
 git clone https://github.com/AkulaAnshul/institutional-memory-for-support.git
 cd institutional-memory-for-support
 
-# environment (conda)
-conda create --prefix ./.conda python=3.11 -y
-./.conda/bin/pip install -r requirements.txt
-
-# or environment (venv, if you don't use conda)
-# python3 -m venv .venv && ./.venv/bin/pip install -r requirements.txt
+# one-command setup (creates ./.conda or ./.venv and installs deps)
+./setup.sh
 
 # run the whole flow from the command line
 USE_FAKE_MEMORY=1 USE_FAKE_AGENT=1 ./.conda/bin/python scripts/seed.py
@@ -148,7 +144,9 @@ and consolidates asynchronously.
    > "Same ticket. Memory on. This isn't a longer prompt — it's memory."
 
 3. **Show the learning.** Click **Play live stream**. Tickets stream in and get drafted;
-   the **Learning curve** chart rises as more replies are grounded in memory.
+   the **Learning curve** chart rises as more replies are grounded in memory. (The
+   dropdown next to the button controls how many tickets replay — 6 by default — and the
+   button becomes **Stop stream** while it runs.)
 
 4. **Show the institutional brain.** Point at the **Emerging issues** panel.
    > "That report is a Hindsight mental model — reading it is a plain database read, no LLM call."

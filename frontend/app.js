@@ -6,6 +6,7 @@ const state = {
   tickets: [],
   selected: null,
   streaming: false,
+  source: null,
   metrics: [],
 };
 
@@ -357,16 +358,35 @@ async function bootstrapSeed() {
   }
 }
 
+function setStreamButton(streaming) {
+  const btn = $("btn-stream");
+  btn.classList.toggle("danger", streaming);
+  btn.innerHTML = streaming
+    ? '<svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2"/></svg> Stop stream'
+    : '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg> Play stream';
+}
+
+function stopStream(message) {
+  if (state.source) { state.source.close(); state.source = null; }
+  state.streaming = false;
+  setStreamButton(false);
+  setStatus("Hindsight connected", "ok");
+  if (message) toast(message, "ok");
+}
+
 function playStream() {
-  if (state.streaming) return;
+  if (state.streaming) { stopStream("Stream stopped."); return; }
   state.streaming = true;
   state.metrics = [];
   renderLearningChart();
-  $("btn-stream").disabled = true;
+  setStreamButton(true);
   setStatus("streaming", "ok");
   toast("Live ticket stream running…");
 
-  const source = new EventSource("/api/stream?delay=2.6");
+  const limit = $("stream-count") ? $("stream-count").value : "6";
+  const source = new EventSource(`/api/stream?delay=2.4&limit=${encodeURIComponent(limit)}`);
+  state.source = source;
+
   source.addEventListener("ticket", async (event) => {
     const item = JSON.parse(event.data);
     state.tickets.push(item);
@@ -379,18 +399,8 @@ function playStream() {
       if (last) last.scrollIntoView({ block: "nearest", behavior: "smooth" });
     }
   });
-  source.addEventListener("done", () => {
-    source.close();
-    state.streaming = false;
-    $("btn-stream").disabled = false;
-    setStatus("Hindsight connected", "ok");
-    toast("Stream complete.", "ok");
-  });
-  source.onerror = () => {
-    source.close();
-    state.streaming = false;
-    $("btn-stream").disabled = false;
-  };
+  source.addEventListener("done", () => stopStream("Stream complete."));
+  source.onerror = () => stopStream();
 }
 
 function setMode(mode) {

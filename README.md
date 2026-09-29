@@ -73,23 +73,22 @@ same turn as recall, because Hindsight extracts memories asynchronously.
 
 **Full step-by-step instructions (including a no-key offline demo and a showcase script):
 [`docs/RUN_AND_SHOWCASE.md`](docs/RUN_AND_SHOWCASE.md).**
+**Producing the content deliverables (video, LinkedIn, article):
+[`docs/TEAM_GUIDE.md`](docs/TEAM_GUIDE.md).**
 
 Everything lives in this directory; the Python env is project-local and the frontend has
-**no npm/build step**.
+**no npm/build step**. The easiest path is the one-command setup script.
 
 ```bash
-# 1. Project-local Python 3.11 env (conda, or `python3 -m venv .venv`)
-conda create --prefix ./.conda python=3.11 -y
-./.conda/bin/pip install -r requirements.txt
+# 1. One-command setup (conda or venv; creates .env from the example)
+./setup.sh                 # macOS/Linux
+# setup.bat                # Windows (double-click)
 
-# 2. Configure (copy and fill in keys)
-cp .env.example .env
-
-# 3. Seed historical tickets into Hindsight (retain → consolidate → mental models)
+# 2. Add your keys to .env, then seed history into Hindsight
 ./.conda/bin/python scripts/seed.py
 
-# 4. Run the console
-./run.sh          # http://127.0.0.1:8000
+# 3. Run the console
+./run.sh                   # http://127.0.0.1:8000   (Windows: run.bat)
 ```
 
 ### Keys

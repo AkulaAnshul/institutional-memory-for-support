@@ -123,12 +123,18 @@ def regressions() -> dict[str, Any]:
 
 
 @app.get("/api/stream")
-async def stream(delay: float = 2.0) -> StreamingResponse:
-    """Replay the demo stream as server-sent events."""
+async def stream(delay: float = 2.0, limit: int = 0) -> StreamingResponse:
+    """Replay the demo stream as server-sent events.
+
+    ``limit`` caps how many tickets are emitted (0 = all), so demos stay short.
+    """
     service = get_service()
+    items = service.demo_stream()
+    if limit and limit > 0:
+        items = items[:limit]
 
     async def gen():
-        for item in service.demo_stream():
+        for item in items:
             payload = {
                 "ticket": item.model_dump(mode="json"),
                 "customer": service.customer_for(item.customer_id).model_dump(),
