@@ -186,7 +186,3 @@ tests/      pytest suite
 - **Technical implementation** — layered architecture, async-safe pipeline, error handling.
 - **User experience** — a 60-second amnesia-vs-memory story with a live dashboard.
 - **Real-world impact** — fewer repeated tickets, earlier warning of regressions.
-
-## Content
-
-Articles, social posts and the demo video live under `content/`.
