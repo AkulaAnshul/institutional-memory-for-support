@@ -112,8 +112,9 @@ same turn races the extractor.
 
 ### Stack (aligned to the brief)
 - **Memory:** Hindsight (Cloud, API 0.10.1) — the mandated technology.
-- **LLM:** Groq **`openai/gpt-oss-120b`** with function calling. (The brief's recommended
-  `qwen/qwen3-32b` was shut down on 2026-07-17; this is its documented replacement.)
+- **LLM:** Groq **`openai/gpt-oss-20b`** with function calling (cheap, fast). Set
+  `GROQ_MODEL=openai/gpt-oss-120b` for maximum reply quality. (The brief's recommended
+  `qwen/qwen3-32b` was shut down on 2026-07-17.)
 - **Backend:** Python 3.11 + FastAPI.
 - **Frontend:** hand-written HTML/CSS/JS served by FastAPI — no build step.
 - **Data:** 15 customers, 69 historical tickets seeded into memory, a 51-ticket live demo

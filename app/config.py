@@ -30,9 +30,9 @@ HINDSIGHT_API_KEY = _get("HINDSIGHT_API_KEY")
 
 GROQ_API_KEY = _get("GROQ_API_KEY")
 # The brief recommends qwen/qwen3-32b, but Groq shut that model down on
-# 2026-07-17. openai/gpt-oss-120b is the documented replacement and supports
-# tool calling + JSON schema mode.
-GROQ_MODEL = _get("GROQ_MODEL", default="openai/gpt-oss-120b")
+# 2026-07-17. We default to openai/gpt-oss-20b (cheap, fast, tool calling);
+# set GROQ_MODEL=openai/gpt-oss-120b for maximum reply quality.
+GROQ_MODEL = _get("GROQ_MODEL", default="openai/gpt-oss-20b")
 
 ORG_BANK_ID = _get("ORG_BANK_ID", default="org:acme")
 ORG_NAME = "Acme Support"

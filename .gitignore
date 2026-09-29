@@ -28,3 +28,7 @@ docs/LINKEDIN_GUIDE.md
 
 # Content deliverables (article, social, video script) — shared privately
 content/
+
+# Private handoff bundle for the team
+T1/
+*.zip

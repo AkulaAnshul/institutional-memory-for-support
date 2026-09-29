@@ -92,7 +92,9 @@ Everything lives in this directory; the Python env is project-local and the fron
 ### Keys
 
 - **GROQ_API_KEY** — https://console.groq.com/keys. The default model is
-  `openai/gpt-oss-120b`. (The brief's `qwen/qwen3-32b` was shut down on 2026‑07‑17.)
+  `openai/gpt-oss-20b` (cheap, fast, tool calling); set
+  `GROQ_MODEL=openai/gpt-oss-120b` for maximum reply quality. (The brief's
+  `qwen/qwen3-32b` was shut down on 2026‑07‑17.)
 - **Hindsight** — either Hindsight Cloud (`HINDSIGHT_BASE_URL=https://api.hindsight.vectorize.io`,
   use promo `MEMHACK99` for credits) or a self-hosted server
   (`http://localhost:8888`). See `.env.example` for the Docker one-liner.
@@ -155,7 +157,7 @@ Offline sample output:
 | Replies grounded in memory | 0% | 100% |
 | Avg memories cited per reply | 0.00 | 7.27 |
 
-> **Token budget:** the Groq free tier allows 200k tokens/day on `gpt-oss-120b`.
+> **Token budget:** the Groq free tier allows 200k tokens/day on `gpt-oss-20b` / `gpt-oss-120b`.
 > Tool output is capped (see `MAX_MEMORIES`/`_clip` in `app/tools.py`) to keep a
 > ticket at roughly 2–3k tokens, so the full 51-ticket run fits. A *daily* limit
 > is detected and fails fast rather than sleeping on it (`RateLimitExceeded`).

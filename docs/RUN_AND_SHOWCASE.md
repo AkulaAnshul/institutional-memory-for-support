@@ -65,7 +65,8 @@ conda create --prefix ./.conda python=3.11 -y
 2. Create an API key (starts with `gsk_`).
 
 > The brief suggests `qwen/qwen3-32b`, but Groq shut that model down on 2026-07-17.
-> This project uses **`openai/gpt-oss-120b`**, the documented replacement with tool calling.
+> This project uses **`openai/gpt-oss-20b`** (cheap, fast, tool calling). Set
+> `GROQ_MODEL=openai/gpt-oss-20b` for maximum quality.
 
 ### Step 3 — Get Hindsight (pick one)
 
@@ -97,7 +98,7 @@ Then edit `.env`:
 **For Hindsight Cloud:**
 ```dotenv
 GROQ_API_KEY=gsk_xxxxxxxxxxxxxxxxxxxx
-GROQ_MODEL=openai/gpt-oss-120b
+GROQ_MODEL=openai/gpt-oss-20b
 HINDSIGHT_BASE_URL=https://api.hindsight.vectorize.io
 HINDSIGHT_API_KEY=hsk_xxxxxxxxxxxxxxxxxxxx
 ORG_BANK_ID=org:acme
@@ -106,7 +107,7 @@ ORG_BANK_ID=org:acme
 **For self-hosted:**
 ```dotenv
 GROQ_API_KEY=gsk_xxxxxxxxxxxxxxxxxxxx
-GROQ_MODEL=openai/gpt-oss-120b
+GROQ_MODEL=openai/gpt-oss-20b
 HINDSIGHT_BASE_URL=http://localhost:8888
 HINDSIGHT_API_KEY=
 ORG_BANK_ID=org:acme
