@@ -1,4 +1,4 @@
-/* Institutional Memory — console */
+/* Institutional Memory — Support Console */
 const $ = (id) => document.getElementById(id);
 
 const state = {
@@ -9,7 +9,7 @@ const state = {
   metrics: [],
 };
 
-/* ------------------------------ helpers ------------------------------ */
+/* ------------------------------- helpers ------------------------------- */
 function esc(v) {
   return String(v ?? "").replace(/[&<>"']/g, (c) => (
     { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]
@@ -19,12 +19,10 @@ function initials(name) {
   return (name || "?").split(/\s+/).map((w) => w[0]).slice(0, 2).join("").toUpperCase();
 }
 function fmtDate(iso) {
-  const d = new Date(iso);
-  return d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+  return new Date(iso).toLocaleDateString(undefined, { month: "short", day: "numeric" });
 }
-function prettyIssue(t) {
-  return String(t || "").replace(/_/g, " ");
-}
+const prettyIssue = (t) => String(t || "").replace(/_/g, " ");
+
 async function api(path, options) {
   const res = await fetch(path, options);
   if (!res.ok) {
@@ -42,12 +40,17 @@ function toast(message, kind = "") {
   setTimeout(() => {
     el.style.transition = "opacity .3s, transform .3s";
     el.style.opacity = "0";
-    el.style.transform = "translateX(24px)";
+    el.style.transform = "translateX(22px)";
     setTimeout(() => el.remove(), 320);
-  }, 4200);
+  }, 4400);
+}
+function setStatus(text, stateKind = "ok") {
+  $("status-text").textContent = text;
+  const pulse = document.querySelector("#status-pill .pulse");
+  if (pulse) pulse.style.background = stateKind === "error" ? "var(--rose)" : "var(--emerald)";
 }
 
-/* markdown-lite for the mental-model report */
+/* markdown-lite for the emerging-issues report */
 function mdLite(text) {
   const inline = (s) => esc(s)
     .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
@@ -74,7 +77,7 @@ function mdLite(text) {
   return html;
 }
 
-/* ------------------------------ queue ------------------------------ */
+/* ------------------------------- queue ------------------------------- */
 function renderQueue() {
   const list = $("ticket-list");
   list.innerHTML = "";
@@ -108,21 +111,18 @@ function selectTicket(item) {
   pill.dataset.issue = t.issue_type;
   $("t-id").textContent = `${t.id} · ${t.status}`;
   $("t-subject").textContent = t.subject;
-  $("t-tags").innerHTML = [
-    t.product, t.version, t.module, `type: ${t.issue_type}`,
-  ].map((x) => `<span class="tag">${esc(x)}</span>`).join("");
+  $("t-tags").innerHTML = [t.product, t.version, t.module, `type: ${t.issue_type}`]
+    .map((x) => `<span class="tag">${esc(x)}</span>`).join("");
 
   const chip = $("t-customer");
   chip.hidden = false;
-  chip.innerHTML = `${initials(c.name)} · <b>${esc(c.name)}</b> — ${esc(c.company)}`;
+  chip.innerHTML = `<b>${esc(c.name)}</b> — ${esc(c.company)} · ${esc(c.plan)}`;
 
   $("t-body").textContent = t.body;
   $("draft-mode").textContent = state.mode;
-
   renderCustomer(c);
 }
 
-/* ------------------------------ customer ------------------------------ */
 function renderCustomer(c) {
   $("customer-empty").hidden = true;
   const box = $("customer");
@@ -130,10 +130,7 @@ function renderCustomer(c) {
   box.innerHTML =
     `<div class="cust-head">
        <div class="avatar">${esc(initials(c.name))}</div>
-       <div>
-         <div class="cust-name">${esc(c.name)}</div>
-         <div class="cust-sub">${esc(c.company)}</div>
-       </div>
+       <div><div class="cust-name">${esc(c.name)}</div><div class="cust-sub">${esc(c.company)}</div></div>
        <span class="cust-plan" style="margin-left:auto">${esc(c.plan)}</span>
      </div>
      <div class="facts">
@@ -143,7 +140,7 @@ function renderCustomer(c) {
      </div>`;
 }
 
-/* ------------------------------ draft ------------------------------ */
+/* ------------------------------- draft ------------------------------- */
 async function draftSelected() {
   if (!state.selected) return;
   const item = state.tickets.find((x) => x.ticket.id === state.selected);
@@ -178,10 +175,9 @@ async function draftSelected() {
 function renderDraft(result) {
   $("draft-loading").hidden = true;
   $("draft-text").hidden = false;
-
   $("draft-mode").textContent = result.mode;
   $("draft-stats").textContent =
-    `${result.elapsed_ms} ms · ${result.citations.length} memories · ${result.tool_calls.length} calls`;
+    `${result.elapsed_ms}ms · ${result.citations.length} memories · ${result.tool_calls.length} calls`;
 
   const err = $("draft-error");
   if (result.error) {
@@ -202,8 +198,7 @@ function renderDraft(result) {
     const li = document.createElement("li");
     li.className = "citation";
     li.dataset.kind = c.kind;
-    const evidence = c.source_fact_ids && c.source_fact_ids.length
-      ? ` · ${c.source_fact_ids.length} source facts` : "";
+    const evidence = c.source_fact_ids && c.source_fact_ids.length ? ` · ${c.source_fact_ids.length} facts` : "";
     li.innerHTML = `<span class="cite-kind">${esc(c.kind.replace(/_/g, " "))}</span>${esc(c.text)}` +
       `<div class="muted tiny">${esc(evidence)}</div>`;
     cites.appendChild(li);
@@ -225,7 +220,7 @@ function renderDraft(result) {
   recordMetric(result);
 }
 
-/* ------------------------------ learning curve ------------------------------ */
+/* --------------------------- learning curve --------------------------- */
 function recordMetric(result) {
   state.metrics.push({
     grounded: result.used_memory || result.citations.length > 0,
@@ -239,7 +234,7 @@ function renderLearningChart() {
   const s = state.metrics;
   const W = 320, H = 130, padX = 10, padY = 16;
   if (!s.length) {
-    svg.innerHTML = `<text x="14" y="70" fill="#6f7ba0" font-size="11">No drafts yet — replay the stream.</text>`;
+    svg.innerHTML = `<text x="14" y="70" fill="#5b6480" font-size="11" font-family="Inter">No drafts yet — replay the stream.</text>`;
     return;
   }
   let run = 0;
@@ -254,25 +249,24 @@ function renderLearningChart() {
   svg.innerHTML = `
     <defs>
       <linearGradient id="area" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="#34d5ee" stop-opacity="0.45"/>
-        <stop offset="100%" stop-color="#8b7bff" stop-opacity="0"/>
+        <stop offset="0%" stop-color="#22d3ee" stop-opacity="0.4"/>
+        <stop offset="100%" stop-color="#6d5efc" stop-opacity="0"/>
       </linearGradient>
       <linearGradient id="stroke" x1="0" y1="0" x2="1" y2="0">
-        <stop offset="0%" stop-color="#8b7bff"/><stop offset="100%" stop-color="#34d5ee"/>
+        <stop offset="0%" stop-color="#6d5efc"/><stop offset="100%" stop-color="#22d3ee"/>
       </linearGradient>
     </defs>
-    <line x1="${padX}" y1="${y(0)}" x2="${W - padX}" y2="${y(0)}" stroke="rgba(255,255,255,.08)"/>
+    <line x1="${padX}" y1="${y(0)}" x2="${W - padX}" y2="${y(0)}" stroke="rgba(255,255,255,.09)"/>
     <line x1="${padX}" y1="${y(0.5)}" x2="${W - padX}" y2="${y(0.5)}" stroke="rgba(255,255,255,.05)"/>
-    <line x1="${padX}" y1="${y(1)}" x2="${W - padX}" y2="${y(1)}" stroke="rgba(255,255,255,.08)"/>
+    <line x1="${padX}" y1="${y(1)}" x2="${W - padX}" y2="${y(1)}" stroke="rgba(255,255,255,.09)"/>
     <path d="${area}" fill="url(#area)"/>
     <path d="${line}" fill="none" stroke="url(#stroke)" stroke-width="2.5" stroke-linecap="round"/>
-    <circle cx="${x(s.length - 1).toFixed(1)}" cy="${y(last).toFixed(1)}" r="4" fill="#34d5ee" stroke="#06080f" stroke-width="2"/>
-    <text x="${padX}" y="12" fill="#eaeefb" font-size="13" font-weight="700">${(last * 100).toFixed(0)}% grounded</text>`;
-  $("learning-stats").textContent =
-    `${s.length} drafts · avg ${avg.toFixed(1)} memories cited`;
+    <circle cx="${x(s.length - 1).toFixed(1)}" cy="${y(last).toFixed(1)}" r="4" fill="#22d3ee" stroke="#050608" stroke-width="2"/>
+    <text x="${padX}" y="12" fill="#f1f3fb" font-size="13" font-weight="700" font-family="Inter">${(last * 100).toFixed(0)}% grounded</text>`;
+  $("learning-stats").textContent = `${s.length} drafts · avg ${avg.toFixed(1)} memories cited`;
 }
 
-/* ------------------------------ side panels ------------------------------ */
+/* ------------------------------ side ------------------------------ */
 async function loadEmerging() {
   try {
     const model = await api("/api/emerging-issues");
@@ -299,9 +293,7 @@ async function loadRegressions() {
     $("stat-regressions").textContent = String(regs.length);
     const box = $("regressions");
     box.innerHTML = "";
-    if (!regs.length) {
-      box.innerHTML = '<div class="muted tiny">No regressions detected.</div>';
-    }
+    if (!regs.length) box.innerHTML = '<div class="muted tiny">No regressions detected.</div>';
     for (const r of regs) {
       const el = document.createElement("div");
       el.className = "reg-item";
@@ -311,7 +303,7 @@ async function loadRegressions() {
            <span class="reg-badge">fixed in ${esc(r.previously_fixed_in || "?")}</span>
            <span class="reg-badge">back in ${esc(r.currently_affected || "?")}</span>
            <span class="reg-badge">${esc(String(r.affected_customers ?? "?"))} affected</span>
-           ${r.confidence ? `<span class="reg-badge conf">${esc(r.confidence)} confidence</span>` : ""}
+           ${r.confidence ? `<span class="reg-badge conf">${esc(r.confidence)} conf</span>` : ""}
          </div>`;
       box.appendChild(el);
     }
@@ -324,11 +316,11 @@ async function loadRegressions() {
   }
 }
 
-/* ------------------------------ stream / mode / seed ------------------------------ */
+/* --------------------------- stream / mode --------------------------- */
 async function bootstrapSeed() {
   const btn = $("btn-seed");
   btn.disabled = true;
-  toast("Seeding historical tickets into Hindsight… this can take a few minutes.");
+  toast("Seeding historical tickets into Hindsight… this can take a few minutes.", "warn");
   try {
     const out = await api("/api/bootstrap", { method: "POST" });
     toast(`Seeded ${out.seeded_tickets} tickets across ${out.customers} customers.`, "ok");
@@ -346,6 +338,7 @@ function playStream() {
   state.metrics = [];
   renderLearningChart();
   $("btn-stream").disabled = true;
+  setStatus("streaming", "ok");
   toast("Live ticket stream running…");
 
   const source = new EventSource("/api/stream?delay=2.6");
@@ -362,6 +355,7 @@ function playStream() {
     source.close();
     state.streaming = false;
     $("btn-stream").disabled = false;
+    setStatus("Hindsight connected", "ok");
     toast("Stream complete.", "ok");
   });
   source.onerror = () => {
@@ -379,24 +373,133 @@ function setMode(mode) {
   $("draft-mode").textContent = mode;
 }
 
-/* ------------------------------ init ------------------------------ */
+async function copyDraft() {
+  const text = $("draft-text").textContent;
+  if (!text) return;
+  try {
+    await navigator.clipboard.writeText(text);
+    toast("Reply copied to clipboard.", "ok");
+  } catch (e) {
+    toast("Copy failed.", "error");
+  }
+}
+
+/* --------------------------- command palette --------------------------- */
+const palette = { open: false, items: [], index: 0 };
+
+function paletteItems(query) {
+  const q = query.trim().toLowerCase();
+  const actions = [
+    { label: "Play live stream", icon: "▶", run: playStream },
+    { label: "Run regression audit", icon: "⚑", run: loadRegressions },
+    { label: "Seed history", icon: "↧", run: bootstrapSeed },
+    { label: "Switch to Memory mode", icon: "◆", run: () => setMode("memory") },
+    { label: "Switch to Amnesia mode", icon: "◇", run: () => setMode("amnesia") },
+  ];
+  const tickets = state.tickets.map((it) => ({
+    label: it.ticket.subject,
+    sub: `${it.ticket.id} · ${it.customer.company}`,
+    icon: "▤",
+    run: () => selectTicket(it),
+  }));
+  return [...actions, ...tickets]
+    .filter((x) => !q || `${x.label} ${x.sub || ""}`.toLowerCase().includes(q))
+    .slice(0, 40);
+}
+
+function renderPalette() {
+  const list = $("palette-results");
+  list.innerHTML = "";
+  if (!palette.items.length) {
+    list.innerHTML = '<li class="p-empty">No matches.</li>';
+    return;
+  }
+  palette.items.forEach((item, i) => {
+    const li = document.createElement("li");
+    li.className = i === palette.index ? "sel" : "";
+    li.innerHTML = `<span class="p-ico">${item.icon || "•"}</span><span>${esc(item.label)}</span>` +
+      (item.sub ? `<span class="p-sub">${esc(item.sub)}</span>` : "");
+    li.onmouseenter = () => { palette.index = i; renderPalette(); };
+    li.onclick = () => runPalette();
+    list.appendChild(li);
+  });
+}
+
+function openPalette() {
+  palette.open = true;
+  palette.index = 0;
+  $("palette-overlay").hidden = false;
+  $("palette-input").value = "";
+  palette.items = paletteItems("");
+  renderPalette();
+  $("palette-input").focus();
+}
+function closePalette() {
+  palette.open = false;
+  $("palette-overlay").hidden = true;
+}
+function runPalette() {
+  const item = palette.items[palette.index];
+  if (!item) return;
+  closePalette();
+  item.run();
+}
+
+/* ------------------------------- init ------------------------------- */
 async function init() {
+  // interactions
   $("mode-memory").onclick = () => setMode("memory");
   $("mode-amnesia").onclick = () => setMode("amnesia");
   $("btn-seed").onclick = bootstrapSeed;
   $("btn-stream").onclick = playStream;
   $("btn-draft").onclick = draftSelected;
   $("btn-regressions").onclick = loadRegressions;
+  $("btn-copy").onclick = copyDraft;
+  $("search-trigger").onclick = openPalette;
+  $("empty-play").onclick = playStream;
+  $("palette-overlay").onclick = (e) => { if (e.target === $("palette-overlay")) closePalette(); };
+  $("palette-input").addEventListener("input", (e) => {
+    palette.items = paletteItems(e.target.value);
+    palette.index = 0;
+    renderPalette();
+  });
 
+  // cursor spotlight
+  window.addEventListener("mousemove", (e) => {
+    const s = $("spotlight");
+    s.style.setProperty("--mx", `${e.clientX}px`);
+    s.style.setProperty("--my", `${e.clientY}px`);
+  });
+
+  // keyboard
+  document.addEventListener("keydown", (e) => {
+    const typing = /input|textarea/i.test((e.target.tagName || ""));
+    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") { e.preventDefault(); palette.open ? closePalette() : openPalette(); return; }
+    if (e.key === "Escape") { closePalette(); return; }
+    if (palette.open) {
+      if (e.key === "ArrowDown") { e.preventDefault(); palette.index = Math.min(palette.index + 1, palette.items.length - 1); renderPalette(); }
+      else if (e.key === "ArrowUp") { e.preventDefault(); palette.index = Math.max(palette.index - 1, 0); renderPalette(); }
+      else if (e.key === "Enter") { e.preventDefault(); runPalette(); }
+      return;
+    }
+    if (typing) return;
+    if (e.key === "1") setMode("memory");
+    else if (e.key === "2") setMode("amnesia");
+    else if (e.key.toLowerCase() === "r") loadRegressions();
+    else if (e.key === " ") { e.preventDefault(); playStream(); }
+  });
+
+  // data
   try {
     const health = await api("/api/health");
     const base = health.memory?.base_url || "";
     const kind = base.includes("hindsight.vectorize.io") ? "Hindsight Cloud"
-      : base.includes("localhost") ? "Self-hosted"
-      : (base || "offline");
+      : base.includes("localhost") ? "Self-hosted" : (base || "offline");
     $("stat-memory").textContent = kind;
+    setStatus(kind === "offline" ? "offline mode" : "Hindsight connected", kind === "offline" ? "error" : "ok");
   } catch (e) {
     $("stat-memory").textContent = "unavailable";
+    setStatus("memory unavailable", "error");
   }
 
   try {
