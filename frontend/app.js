@@ -78,27 +78,52 @@ function mdLite(text) {
 }
 
 /* ------------------------------- queue ------------------------------- */
-function renderQueue() {
+function buildTicketItem(item) {
+  const t = item.ticket;
+  const li = document.createElement("li");
+  li.className = "ticket-item";
+  li.dataset.issue = t.issue_type;
+  li.dataset.id = t.id;
+  li.innerHTML =
+    `<span class="subject">${esc(t.subject)}</span>` +
+    `<span class="row"><span class="tz">${esc(prettyIssue(t.issue_type))}</span>` +
+    `<span class="sep">·</span>${esc(t.module)}<span class="sep">·</span>${esc(t.version)}` +
+    `<span class="sep">·</span>${esc(fmtDate(t.created_at))}</span>`;
+  li.onclick = () => selectTicket(item);
+  return li;
+}
+
+function appendTickets(items) {
   const list = $("ticket-list");
-  list.innerHTML = "";
-  for (const item of state.tickets) {
-    const t = item.ticket;
-    const li = document.createElement("li");
-    li.className = "ticket-item" + (t.id === state.selected ? " active" : "");
-    li.dataset.issue = t.issue_type;
-    li.innerHTML =
-      `<span class="subject">${esc(t.subject)}</span>` +
-      `<span class="row"><span class="tz">${esc(prettyIssue(t.issue_type))}</span>` +
-      `<span class="sep">·</span>${esc(t.module)}<span class="sep">·</span>${esc(t.version)}` +
-      `<span class="sep">·</span>${esc(fmtDate(t.created_at))}</span>`;
-    li.onclick = () => selectTicket(item);
+  for (const item of items) {
+    const li = buildTicketItem(item);
+    li.classList.add("enter");
+    li.addEventListener("animationend", () => li.classList.remove("enter"), { once: true });
     list.appendChild(li);
   }
 }
 
+function markActive() {
+  document.querySelectorAll(".ticket-item").forEach((li) => {
+    li.classList.toggle("active", li.dataset.id === state.selected);
+  });
+}
+
+function scrollActiveIntoView() {
+  const el = document.querySelector(".ticket-item.active");
+  if (el) el.scrollIntoView({ block: "nearest", behavior: "smooth" });
+}
+
+function renderQueue() {
+  $("ticket-list").innerHTML = "";
+  appendTickets(state.tickets);
+  markActive();
+}
+
 function selectTicket(item) {
   state.selected = item.ticket.id;
-  renderQueue();
+  markActive();
+  scrollActiveIntoView();
   const t = item.ticket;
   const c = item.customer;
 
@@ -345,10 +370,13 @@ function playStream() {
   source.addEventListener("ticket", async (event) => {
     const item = JSON.parse(event.data);
     state.tickets.push(item);
-    renderQueue();
+    appendTickets([item]);
     if ($("auto-process").checked) {
       selectTicket(item);
       await draftSelected();
+    } else {
+      const last = document.querySelector(".ticket-item:last-child");
+      if (last) last.scrollIntoView({ block: "nearest", behavior: "smooth" });
     }
   });
   source.addEventListener("done", () => {
@@ -495,7 +523,8 @@ async function init() {
     const base = health.memory?.base_url || "";
     const kind = base.includes("hindsight.vectorize.io") ? "Hindsight Cloud"
       : base.includes("localhost") ? "Self-hosted" : (base || "offline");
-    $("stat-memory").textContent = kind;
+    const short = kind === "Hindsight Cloud" ? "Cloud" : kind === "Self-hosted" ? "Local" : "Offline";
+    $("stat-memory").textContent = short;
     setStatus(kind === "offline" ? "offline mode" : "Hindsight connected", kind === "offline" ? "error" : "ok");
   } catch (e) {
     $("stat-memory").textContent = "unavailable";

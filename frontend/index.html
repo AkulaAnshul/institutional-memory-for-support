@@ -73,7 +73,7 @@
         </div>
         <div class="bstat">
           <span class="eyebrow">Memory</span>
-          <strong class="sm" id="stat-memory">—</strong>
+          <strong id="stat-memory">—</strong>
           <span class="bstat-sub">Hindsight backend</span>
         </div>
         <div class="bstat accent">
@@ -88,7 +88,7 @@
     <main class="grid">
       <section class="panel queue">
         <div class="panel-head">
-          <h2 class="eyebrow">Ticket queue</h2>
+          <h2 class="section-label">Ticket queue</h2>
           <label class="switch" title="Auto-draft arriving tickets">
             <input type="checkbox" id="auto-process" checked />
             <span class="track"><span class="thumb"></span></span>
@@ -159,7 +159,7 @@
       <aside class="panel side">
         <div class="card">
           <div class="card-head">
-            <h3><span class="dot cyan"></span> Emerging issues</h3>
+            <h3 class="section-label"><span class="dot cyan"></span> Emerging issues</h3>
             <span id="ei-refreshed" class="muted tiny"></span>
           </div>
           <div id="emerging" class="report"></div>
@@ -167,20 +167,22 @@
 
         <div class="card">
           <div class="card-head">
-            <h3><span class="dot rose"></span> Regression alerts <span class="count" id="reg-count">0</span></h3>
+            <h3 class="section-label"><span class="dot rose"></span> Regression alerts <span class="count" id="reg-count">0</span></h3>
             <button id="btn-regressions" class="btn ghost tiny">Run audit</button>
           </div>
-          <div id="regressions" class="reg-list"></div>
+          <div id="regressions" class="reg-list">
+            <div class="muted tiny">Run the audit to scan every ticket for fixed-then-returned issues.</div>
+          </div>
         </div>
 
         <div class="card">
-          <div class="card-head"><h3><span class="dot violet"></span> Learning curve</h3></div>
-          <svg id="learning-chart" class="chart" viewBox="0 0 320 130" preserveAspectRatio="none"></svg>
+          <div class="card-head"><h3 class="section-label"><span class="dot violet"></span> Learning curve</h3></div>
+          <svg id="learning-chart" class="chart" viewBox="0 0 320 130"></svg>
           <div id="learning-stats" class="muted tiny">No drafts yet.</div>
         </div>
 
         <div class="card">
-          <div class="card-head"><h3><span class="dot amber"></span> Customer 360</h3></div>
+          <div class="card-head"><h3 class="section-label"><span class="dot amber"></span> Customer 360</h3></div>
           <div id="customer-empty" class="muted">No customer selected.</div>
           <div id="customer" hidden></div>
         </div>
