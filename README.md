@@ -73,8 +73,6 @@ same turn as recall, because Hindsight extracts memories asynchronously.
 
 **Full step-by-step instructions (including a no-key offline demo and a showcase script):
 [`docs/RUN_AND_SHOWCASE.md`](docs/RUN_AND_SHOWCASE.md).**
-**Producing the content deliverables (video, LinkedIn, article):
-[`docs/TEAM_GUIDE.md`](docs/TEAM_GUIDE.md).**
 
 Everything lives in this directory; the Python env is project-local and the frontend has
 **no npm/build step**. The easiest path is the one-command setup script.

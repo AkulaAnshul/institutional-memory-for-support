@@ -20,3 +20,8 @@ venv/
 # Local tooling config (not part of the project)
 opencode.json
 .opencode/
+
+# Internal handoff guides — shared privately with the team, not published
+docs/TEAM_GUIDE.md
+docs/VIDEO_GUIDE.md
+docs/LINKEDIN_GUIDE.md
