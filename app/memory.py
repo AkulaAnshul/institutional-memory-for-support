@@ -8,9 +8,11 @@ from __future__ import annotations
 
 import asyncio
 import contextlib
+import functools
 import logging
 import time
 from collections.abc import Iterable
+from concurrent.futures import ThreadPoolExecutor
 from datetime import UTC, datetime
 from typing import Any
 
@@ -60,6 +62,22 @@ def _iso(ts: datetime) -> str:
     return ts.isoformat()
 
 
+def _on_worker(method):
+    """Run a method on the client's single dedicated thread.
+
+    The Hindsight SDK caches an asyncio event loop per thread and binds its
+    aiohttp session to that loop. FastAPI executes sync endpoints on a thread
+    pool, so calling the SDK from arbitrary threads corrupts the loop. Pinning
+    every call to one worker keeps the SDK and its loop consistent.
+    """
+
+    @functools.wraps(method)
+    def wrapper(self, *args, **kwargs):
+        return self._executor.submit(method, self, *args, **kwargs).result()
+
+    return wrapper
+
+
 def _run_async(coro):
     """Run an async Hindsight sub-API call from synchronous code.
 
@@ -95,10 +113,12 @@ class HindsightMemory:
         self.base_url = base_url or cfg.HINDSIGHT_BASE_URL
         self.api_key = api_key if api_key is not None else cfg.HINDSIGHT_API_KEY
         self.client = Hindsight(base_url=self.base_url, api_key=self.api_key, timeout=120.0)
+        self._executor = ThreadPoolExecutor(max_workers=1, thread_name_prefix="hindsight")
 
     # ------------------------------------------------------------------
     # Health
     # ------------------------------------------------------------------
+    @_on_worker
     def health(self) -> dict[str, Any]:
         version = self.client.get_version()
         return {
@@ -109,11 +129,13 @@ class HindsightMemory:
 
     def close(self) -> None:
         with contextlib.suppress(Exception):  # best effort
-            self.client.close()
+            self._executor.submit(self.client.close).result(timeout=5)
+        self._executor.shutdown(wait=False)
 
     # ------------------------------------------------------------------
     # Banks
     # ------------------------------------------------------------------
+    @_on_worker
     def ensure_org_bank(self) -> None:
         self._safe(
             "create_bank:org",
@@ -145,6 +167,7 @@ class HindsightMemory:
                 ),
             )
 
+    @_on_worker
     def ensure_customer_bank(self, customer: Customer) -> None:
         self._safe(
             "create_bank:customer",
@@ -201,6 +224,7 @@ class HindsightMemory:
             f"customer:{ticket.customer_id}",
         ]
 
+    @_on_worker
     def retain_org_ticket(self, ticket: Ticket) -> str | None:
         resp = self.client.retain(
             bank_id=cfg.ORG_BANK_ID,
@@ -212,6 +236,7 @@ class HindsightMemory:
         )
         return getattr(resp, "operation_id", None)
 
+    @_on_worker
     def retain_customer_ticket(self, ticket: Ticket) -> str | None:
         resp = self.client.retain(
             bank_id=self.customer_bank_id(ticket.customer_id),
@@ -226,6 +251,7 @@ class HindsightMemory:
     # ------------------------------------------------------------------
     # Recall
     # ------------------------------------------------------------------
+    @_on_worker
     def recall_customer_setup(self, customer_id: str) -> list[Citation]:
         resp = self.client.recall(
             bank_id=self.customer_bank_id(customer_id),
@@ -238,6 +264,7 @@ class HindsightMemory:
             for r in resp.results
         ]
 
+    @_on_worker
     def recall_known_issues(
         self,
         query: str,
@@ -272,6 +299,7 @@ class HindsightMemory:
             )
         return out
 
+    @_on_worker
     def reflect_customer(self, customer_id: str, query: str, *, context: str | None = None) -> str:
         resp = self.client.reflect(
             bank_id=self.customer_bank_id(customer_id),
@@ -289,6 +317,7 @@ class HindsightMemory:
     # reflects over the institutional memory to find issues the company
     # believed were fixed but that are being reported again.
     # ------------------------------------------------------------------
+    @_on_worker
     def detect_regressions(self) -> list[dict]:
         resp = self._safe(
             "detect_regressions",
@@ -318,6 +347,7 @@ class HindsightMemory:
     # ------------------------------------------------------------------
     # Mental models (read = pure DB read, no LLM call)
     # ------------------------------------------------------------------
+    @_on_worker
     def ensure_mental_models(self) -> list[str]:
         def ensure(mm_id: str, name: str, source_query: str) -> str | None:
             resp = self._safe(
@@ -362,6 +392,7 @@ class HindsightMemory:
                 operation_ids.append(op)
         return operation_ids
 
+    @_on_worker
     def read_mental_model(self, model_id: str) -> KnownIssue | None:
         try:
             mm = self.client.get_mental_model(cfg.ORG_BANK_ID, model_id, detail="content")
@@ -376,6 +407,7 @@ class HindsightMemory:
             is_stale=getattr(mm, "is_stale", None),
         )
 
+    @_on_worker
     def refresh_all_mental_models(self) -> list[str]:
         operation_ids: list[str] = []
         for mm_id in (MM_EMERGING_ISSUES, MM_KNOWN_ISSUES):
@@ -391,6 +423,7 @@ class HindsightMemory:
     # ------------------------------------------------------------------
     # Consolidation / async operations
     # ------------------------------------------------------------------
+    @_on_worker
     def trigger_consolidation(self) -> str | None:
         resp = self._safe(
             "trigger_consolidation",
@@ -398,6 +431,7 @@ class HindsightMemory:
         )
         return getattr(resp, "operation_id", None)
 
+    @_on_worker
     def wait_for_operation(self, operation_id: str, *, timeout: float = OPERATION_TIMEOUT_S) -> bool:
         """Poll an async operation until it leaves a pending state."""
         if not operation_id:

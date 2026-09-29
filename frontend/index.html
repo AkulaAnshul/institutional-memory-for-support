@@ -3,104 +3,171 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Institutional Memory for Support</title>
+  <title>Institutional Memory · Support Console</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/static/styles.css" />
 </head>
 <body>
-  <header class="topbar">
-    <div class="brand">
-      <span class="logo">◍</span>
-      <div>
-        <h1>Institutional Memory for Support</h1>
-        <p class="tagline">A support agent that remembers each customer — and grows a company-wide brain.</p>
-      </div>
-    </div>
-    <div class="controls">
-      <div class="mode-toggle" role="group" aria-label="Agent mode">
-        <button id="mode-memory" class="active" data-mode="memory">Memory</button>
-        <button id="mode-amnesia" data-mode="amnesia">Amnesia</button>
-      </div>
-      <button id="btn-seed" class="btn">1 · Seed history</button>
-      <button id="btn-stream" class="btn">2 · Play live stream</button>
-    </div>
-  </header>
+  <div class="aurora"></div>
 
-  <div class="statusbar">
-    <span id="status" class="status">Ready.</span>
-    <span class="badges">
-      <span class="badge" id="badge-memory">memory: —</span>
-      <span class="badge" id="badge-model">model: —</span>
-      <span class="badge" id="badge-bank">bank: —</span>
-    </span>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <div class="logo" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M12 3a4 4 0 0 0-4 4 3 3 0 0 0-2 5.2A3 3 0 0 0 8 18a4 4 0 0 0 8 0 3 3 0 0 0 2-5.8A3 3 0 0 0 16 7a4 4 0 0 0-4-4Z"/>
+            <path d="M12 7v10M9 11h6"/>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <h1>Institutional Memory</h1>
+          <p>Support intelligence that remembers, recalls &amp; improves</p>
+        </div>
+      </div>
+
+      <div class="topbar-actions">
+        <div class="segmented" role="group" aria-label="Agent mode">
+          <span id="mode-slider" class="seg-slider"></span>
+          <button id="mode-memory" class="seg active" data-mode="memory">Memory</button>
+          <button id="mode-amnesia" class="seg" data-mode="amnesia">Amnesia</button>
+        </div>
+        <button id="btn-seed" class="btn ghost">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12M7 10l5 5 5-5M4 21h16"/></svg>
+          Seed history
+        </button>
+        <button id="btn-stream" class="btn primary">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+          Play live stream
+        </button>
+      </div>
+    </header>
+
+    <section class="stats" id="stats">
+      <div class="stat">
+        <span class="stat-label">Tickets in stream</span>
+        <span class="stat-value" id="stat-tickets">—</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Customers</span>
+        <span class="stat-value" id="stat-customers">—</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Memory backend</span>
+        <span class="stat-value sm" id="stat-memory">—</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Regressions found</span>
+        <span class="stat-value accent" id="stat-regressions">0</span>
+      </div>
+    </section>
+
+    <main class="grid">
+      <!-- ============ QUEUE ============ -->
+      <section class="panel queue">
+        <div class="panel-head">
+          <h2>Ticket queue</h2>
+          <label class="switch" title="Auto-draft arriving tickets">
+            <input type="checkbox" id="auto-process" checked />
+            <span class="track"><span class="thumb"></span></span>
+            <span class="switch-label">auto-draft</span>
+          </label>
+        </div>
+        <ul id="ticket-list" class="ticket-list"></ul>
+      </section>
+
+      <!-- ============ DETAIL ============ -->
+      <section class="panel detail">
+        <div id="ticket-empty" class="empty-state">
+          <div class="empty-art" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <rect x="3" y="4" width="18" height="16" rx="3"/><path d="M7 9h10M7 13h6"/>
+            </svg>
+          </div>
+          <h3>Select a ticket</h3>
+          <p>Or press <b>Play live stream</b> to watch the agent draft replies in real time.</p>
+        </div>
+
+        <div id="ticket-view" hidden>
+          <div class="ticket-hero">
+            <div class="hero-top">
+              <span class="pill" id="t-issue">—</span>
+              <span class="mono muted" id="t-id">—</span>
+            </div>
+            <h2 id="t-subject" class="hero-subject">—</h2>
+            <div class="tag-row" id="t-tags"></div>
+            <div class="customer-chip" id="t-customer" hidden></div>
+            <pre id="t-body" class="body"></pre>
+            <button id="btn-draft" class="btn primary big">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v12H7l-3 4z"/></svg>
+              Draft reply <span class="mode-tag" id="draft-mode">memory</span>
+            </button>
+          </div>
+        </div>
+
+        <div id="draft-view" hidden>
+          <div class="draft-header">
+            <span class="ai-badge"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.2 6.3L20 10l-5.8 1.7L12 18l-2.2-6.3L4 10l5.8-1.7z"/></svg> AI draft</span>
+            <span id="draft-stats" class="muted mono"></span>
+          </div>
+          <div id="draft-loading" class="draft-loading" hidden>
+            <span></span><span></span><span></span> consulting memory…
+          </div>
+          <div id="draft-text" class="draft"></div>
+          <div id="draft-error" class="alert error" hidden></div>
+          <div class="two-col">
+            <div class="subpanel">
+              <div class="subpanel-head"><h4>Grounded in memory</h4><span class="count" id="cite-count">0</span></div>
+              <ul id="citations" class="citations"></ul>
+            </div>
+            <div class="subpanel">
+              <div class="subpanel-head"><h4>Memory calls</h4><span class="count" id="call-count">0</span></div>
+              <ul id="toolcalls" class="timeline"></ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ INSIGHTS ============ -->
+      <aside class="panel side">
+        <div class="card">
+          <div class="card-head">
+            <h3><span class="dot cyan"></span> Emerging issues</h3>
+            <span id="ei-refreshed" class="muted tiny"></span>
+          </div>
+          <div id="emerging" class="report"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-head">
+            <h3><span class="dot rose"></span> Regression alerts <span class="count" id="reg-count">0</span></h3>
+            <button id="btn-regressions" class="btn ghost tiny">Run audit</button>
+          </div>
+          <div id="regressions" class="reg-list"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><h3><span class="dot violet"></span> Learning curve</h3></div>
+          <svg id="learning-chart" class="chart" viewBox="0 0 320 130" preserveAspectRatio="none"></svg>
+          <div id="learning-stats" class="muted tiny">No drafts yet.</div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><h3><span class="dot amber"></span> Customer 360</h3></div>
+          <div id="customer-empty" class="muted">No customer selected.</div>
+          <div id="customer" hidden></div>
+        </div>
+      </aside>
+    </main>
+
+    <footer class="footer">
+      <span>Built on <a href="https://hindsight.vectorize.io/" target="_blank" rel="noreferrer">Hindsight</a> agent memory · Groq <code>openai/gpt-oss-120b</code></span>
+      <span class="muted" id="footer-bank"></span>
+    </footer>
   </div>
 
-  <main class="grid">
-    <section class="panel queue">
-      <h2>Ticket queue</h2>
-      <label class="auto"><input type="checkbox" id="auto-process" checked /> auto-draft on arrival</label>
-      <ul id="ticket-list"></ul>
-    </section>
-
-    <section class="panel detail">
-      <div id="ticket-empty" class="empty">Select a ticket, or play the live stream.</div>
-      <div id="ticket-view" hidden>
-        <div class="ticket-head">
-          <h2 id="t-subject"></h2>
-          <span id="t-meta" class="meta"></span>
-        </div>
-        <pre id="t-body" class="body"></pre>
-        <button id="btn-draft" class="btn primary">Draft reply (<span id="draft-mode">memory</span>)</button>
-      </div>
-      <div id="draft-view" hidden>
-        <div class="draft-head">
-          <h3>Draft reply</h3>
-          <span id="draft-stats" class="meta"></span>
-        </div>
-        <pre id="draft-text" class="draft"></pre>
-        <div id="draft-error" class="error" hidden></div>
-        <div class="two-col">
-          <div>
-            <h4>Grounded in memory <span id="cite-count" class="pill">0</span></h4>
-            <ul id="citations" class="citations"></ul>
-          </div>
-          <div>
-            <h4>Memory calls</h4>
-            <ul id="toolcalls" class="toolcalls"></ul>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <aside class="panel side">
-      <div class="card">
-        <h2>Emerging issues <span class="muted" id="ei-refreshed"></span></h2>
-        <p class="hint">Read straight from Hindsight's mental model — no LLM call.</p>
-        <pre id="emerging" class="report">—</pre>
-      </div>
-      <div class="card">
-        <h2>Regression alerts <span class="muted" id="reg-count"></span></h2>
-        <p class="hint">The agent reflects over every ticket to find issues we marked "fixed" that came back.</p>
-        <button id="btn-regressions" class="btn">Run regression audit</button>
-        <ul id="regressions" class="citations"></ul>
-      </div>
-      <div class="card">
-        <h2>Learning curve</h2>
-        <p class="hint">Replies grounded in memory as new tickets stream in.</p>
-        <svg id="learning-chart" class="chart" viewBox="0 0 300 120" preserveAspectRatio="none"></svg>
-        <div id="learning-stats" class="muted">No drafts yet.</div>
-      </div>
-      <div class="card">
-        <h2>Customer 360</h2>
-        <div id="customer-empty" class="muted">No customer selected.</div>
-        <div id="customer" hidden>
-          <div class="cust-name" id="c-name"></div>
-          <div class="cust-sub" id="c-sub"></div>
-          <dl id="c-facts"></dl>
-        </div>
-      </div>
-    </aside>
-  </main>
-
+  <div id="toasts" class="toasts"></div>
   <script src="/static/app.js"></script>
 </body>
 </html>
